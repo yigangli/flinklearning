@@ -13,15 +13,18 @@ object CoMapExample {
     val stream2:DataStream[(String,Int)] = env.fromElements(
       ("zuoyuan",22),("baiyuan",33)
     )
-
+    //method1
     val connectedStream:ConnectedStreams[(String,Int),(String,Int)] = stream1.keyBy(_._1)
       .connect(stream2.keyBy(_._1))
     val res = connectedStream.map(new MyMapFunction)
-
+    //method2
     val conned:ConnectedStreams[(String,Int),(String,Int)] = stream1.connect(stream2)
     val res2 = conned.keyBy(0,0).map(new MyMapFunction)
     res.print()
     res2.print()
+    //broadcast
+    stream1.connect(stream2.broadcast)
+
     env.execute()
   }
   class MyMapFunction extends CoMapFunction[(String,Int),(String,Int),String]{
